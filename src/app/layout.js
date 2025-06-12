@@ -5,9 +5,9 @@ import { useState } from 'react';
 import { SessionProvider } from 'next-auth/react';
 import './globals.css';
 import AuthContextProvider from '@/components/Context/AuthContext/AuthContext';
-import { ProductProvider } from '@/utlis/ProductContext';
 import CartContextProvider from '@/components/Context/AuthContext/CartContext';
 import { Toaster } from 'react-hot-toast'; // ← استدعاء Toaster
+import { ProductProvider } from './utils/ProductContext';
 
 
 export default function RootLayout({ children }) {
@@ -21,7 +21,9 @@ export default function RootLayout({ children }) {
             <SessionProvider>
               <QueryClientProvider client={queryClient}>
                 <ProductProvider>
-                  {children}
+                  <ProductProvider>
+                    {children}
+                  </ProductProvider>
                   <Toaster position="top-center" reverseOrder={false} /> {/* ← هنا الإضافة */}
                 </ProductProvider>
               </QueryClientProvider>

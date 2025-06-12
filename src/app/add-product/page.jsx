@@ -5,7 +5,6 @@
 // import React, { useState, useContext } from 'react';
 // import { RiUploadCloud2Line } from 'react-icons/ri';
 // import { useRouter } from 'next/navigation';
-// import { ProductContext } from '@/utlis/ProductContext';
 
 // const AddProductPage = () => {
 //   const { addProduct } = useContext(ProductContext);
@@ -285,12 +284,15 @@
 
 import AddHeader from '@/components/Add Prod/AddHeader';
 import Navbar from '@/components/Navbar/Navbar';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { RiUploadCloud2Line } from 'react-icons/ri';
 import { useRouter } from 'next/navigation';
+import { ProductContext } from '../utils/ProductContext';
 
 const AddProductPage = () => {
   const router = useRouter();
+  const { addProduct } = useContext(ProductContext);
+
   const [product, setProduct] = useState({
     name: '',
     quantity: '',
@@ -305,10 +307,7 @@ const AddProductPage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setProduct((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setProduct((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleImageUpload = (e) => {
@@ -326,8 +325,8 @@ const AddProductPage = () => {
 
   const handleSave = async () => {
     const {
-      name, quantity, price, categoryId, image, expiryDate,
-      description, restaurantId, productionDate
+      name, quantity, price, categoryId, image,
+      expiryDate, description, restaurantId, productionDate
     } = product;
 
     if (!name || !quantity || !price || !categoryId || !image || !restaurantId || !productionDate || !expiryDate) {
@@ -356,10 +355,31 @@ const AddProductPage = () => {
       });
 
       const data = await res.json();
+
       if (!res.ok) {
         alert(data.message || 'Something went wrong');
         return;
       }
+
+      let currentCount = localStorage.getItem('totalProducts');
+      currentCount = currentCount ? parseInt(currentCount) + 1 : 1;
+      localStorage.setItem('totalProducts', currentCount);
+
+      const addedProduct = {
+        id: data.product?.id || Date.now().toString(),
+        name,
+        quantity,
+        price,
+        image: data.product?.image || URL.createObjectURL(image),
+        stock: quantity,
+        category: categoryId,
+        description,
+        tags: [],
+        status: 'active',
+      };
+
+      addProduct(addedProduct);
+
       alert('Product added successfully');
       router.push('/products');
     } catch (err) {
@@ -448,3 +468,5 @@ const AddProductPage = () => {
 };
 
 export default AddProductPage;
+
+

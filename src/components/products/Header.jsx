@@ -5,7 +5,7 @@ import { FiSearch } from 'react-icons/fi';
 import { FaRegQuestionCircle } from 'react-icons/fa';
 import { IoMdMenu } from 'react-icons/io';
 import Link from 'next/link';
-import { ProductContext } from '@/utlis/ProductContext';
+import { ProductContext } from '@/app/utils/ProductContext';
 
 const Header = () => {
   const { searchProducts, searchQuery } = useContext(ProductContext); // إضافة searchQuery

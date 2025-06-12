@@ -218,16 +218,13 @@ export default function CartPage() {
     getCartData();
   }, []);
 
-  const handleRemove = async (cartItemId) => {
-    try {
-      await axiosInstance.delete(`/cart/remove/${cartItemId}`);
-      toast.success('Item removed');
-      getCartData();
-    } catch (error) {
-      toast.error('Failed to remove item');
-      console.error(error.response?.data || error.message);
-    }
-  };
+const handleRemove = (cartItemId) => {
+  setCartItems((prevItems) =>
+    prevItems.filter((item) => item._id !== cartItemId)
+  );
+  toast.success("Item removed from cart");
+};
+
 
   const handleQuantityChange = async (itemCartId, currentQty, action) => {
     const newQty = action === 'increase' ? currentQty + 1 : currentQty - 1;
@@ -307,13 +304,13 @@ export default function CartPage() {
                   <div>{(parseFloat(item.itemId.price.replace(/[^\d.]/g, "")) * item.quantity).toFixed(2)} EGP</div>
                   <div className="flex justify-end">
                     <button
-                      onClick={() => handleRemove(item._id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <div className="w-6 h-6 rounded-full border border-red-500 flex items-center justify-center">
-                        <X size={14} />
-                      </div>
-                    </button>
+  onClick={() => handleRemove(item._id)}
+  className="text-red-500 hover:text-red-700"
+>
+  <div className="w-6 h-6 rounded-full border border-red-500 flex items-center justify-center">
+    <X size={14} />
+  </div>
+</button>
                   </div>
                 </div>
               ))}
