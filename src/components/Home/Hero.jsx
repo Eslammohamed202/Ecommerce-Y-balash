@@ -163,7 +163,7 @@ useEffect(() => {
           <div className='flex flex-col items-start justify-center gap-2 lg:pl-5 pl-2'>
             <p className='text-[#6B7280] text-lg font-bold'>Monthly Earnings</p>
             <p className='text-black text-xl font-bold'>
-              {earningsData?.earnings?.currentMonth?.currency} {earningsData?.earnings?.currentMonth?.total || 0}
+              {earningsData?.earnings?.currentMonth?.currency} {earningsData?.earnings?.currentMonth?.total}
             </p>
             <div className='flex items-center'>
               {parseFloat(earningsData?.earnings?.percentageChange) > 0 ? (

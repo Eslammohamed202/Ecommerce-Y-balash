@@ -181,7 +181,7 @@ export default function NavbarHome() {
                   onClick={() => signOut()}
                   className="block w-full text-left px-4 py-2 text-white transition"
                 >
-                  تسجيل الخروج
+                  Logout
                 </button>
               </div>
             )}

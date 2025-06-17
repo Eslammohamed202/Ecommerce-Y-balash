@@ -1,80 +1,105 @@
 "use client";
 
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { cartContext } from "../Context/AuthContext/CartContext";
 
 const TOKEN =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MDU0YjFlZmQ3OTIwODE3ZDllYmI5YyIsImlhdCI6MTc0ODg2MDE5NiwiZXhwIjoxNzUxNDUyMTk2fQ.0fkUoakCkGAv4Shtp7Pz2BYkZ87RHB7wb02xOENSLnA';
+  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MDU0YjFlZmQ3OTIwODE3ZDllYmI5YyIsImlhdCI6MTc0ODg2MDE5NiwiZXhwIjoxNzUxNDUyMTk2fQ.0fkUoakCkGAv4Shtp7Pz2BYkZ87RHB7wb02xOENSLnA";
 
 export default function Payment() {
   const [cardNumber, setCardNumber] = useState("");
   const [cvv, setCvv] = useState("");
   const [totalPrice, setTotalPrice] = useState(0);
   const [selectedCountry, setSelectedCountry] = useState("Egypt");
-
-  const { allItems, getUserCart } = useContext(cartContext);
   const router = useRouter();
 
-  const countries = ["Egypt", "Saudi Arabia", "UAE", "Qatar", "Morocco", "Algeria"];
+  const countries = [
+    "Egypt",
+    "Saudi Arabia",
+    "UAE",
+    "Qatar",
+    "Morocco",
+    "Algeria",
+  ];
 
-  const handlePayment = async () => {
-    const correctCard = "4242424242424242";
-    const correctCvv = "123";
-
-    if (cardNumber === correctCard && cvv === correctCvv) {
+  useEffect(() => {
+    const getCartData = async () => {
       try {
-        const { data } = await axios.post(
-          "https://y-balash.vercel.app/api/purchases/payment",
-          {}, // body is empty
+        const { data } = await axios.get(
+          "https://y-balash.vercel.app/api/cart",
           {
-            headers: {
-              Authorization: `Bearer ${TOKEN}`,
-            },
+            headers: { Authorization: TOKEN },
           }
         );
 
-        if (data.clientSecret) {
-          Swal.fire("Success", "Payment completed correctly", "success");
+        const items = data.items || [];
+        const total = items.reduce((sum, el) => {
+          const price = parseFloat(el?.itemId?.price || "0");
+          return sum + price * el.quantity;
+        }, 0);
 
-          // 🧹 تفريغ السلة من السيرفر
-          await getUserCart();
-
-          // 🕒 إعادة التوجيه بعد 3 ثواني
-          setTimeout(() => {
-            router.push("/client-home");
-          }, 3000);
-        } else {
-          Swal.fire("Error", "Something went wrong with payment", "error");
-        }
+        const roundedTotal = Math.round(total * 100) / 100; // تقريب لرقمين عشريين
+        setTotalPrice(roundedTotal);
       } catch (error) {
-        console.error("Payment error:", error);
-        if (error.response) {
-          console.log("Error Response Data:", error.response.data);
-          Swal.fire("Error", error.response.data.message || "API Error", "error");
-        } else {
-          Swal.fire("Error", "Network or unknown error occurred", "error");
-        }
+        console.error("Error fetching cart:", error);
       }
-    } else if (cvv !== correctCvv) {
-      Swal.fire("Error", "Please enter the correct CVV number", "error");
-    } else {
-      Swal.fire("Error", "The card number is incorrect", "error");
-    }
-  };
+    };
 
-  useEffect(() => {
-    if (allItems?.length > 0) {
-      const total = allItems.reduce((sum, el) => {
-        const priceString = el?.itemId?.price || "0";
-        const numericPrice = Number(priceString.replace(" EGP", "").trim()) || 0;
-        return sum + numericPrice;
-      }, 0);
-      setTotalPrice(total);
+    getCartData();
+  }, []);
+
+  const handlePayment = async () => {
+  const correctCard = "4242424242424242";
+  const correctCvv = "123";
+
+  if (cardNumber === correctCard && cvv === correctCvv) {
+    try {
+      const amountInCents = Math.round(totalPrice);
+      
+      if (isNaN(amountInCents)) {
+        throw new Error("Invalid amount");
+      }
+
+      console.log("totalPrice:", totalPrice);
+      console.log("amountInCents:", amountInCents);
+      console.log("Sending payload:", { amount: amountInCents });
+
+      const { data } = await axios.post(
+        "https://y-balash.vercel.app/api/purchases/payment",
+        { amount: amountInCents },
+        {
+          headers: {
+            Authorization: TOKEN,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (data.clientSecret) {
+        Swal.fire("Success", "Payment completed successfully", "success");
+        setTimeout(() => {
+          router.push("/client-home");
+        }, 3000);
+      } else {
+        Swal.fire("Error", "Something went wrong with the payment", "error");
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      Swal.fire(
+        "Error",
+        error.response?.data?.message || "Payment API error",
+        "error"
+      );
     }
-  }, [allItems]);
+  } else if (cvv !== correctCvv) {
+    Swal.fire("Error", "Invalid CVV", "error");
+  } else {
+    Swal.fire("Error", "Invalid Card Number", "error");
+  }
+};
+
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-100">
@@ -114,7 +139,7 @@ export default function Payment() {
           </div>
         </div>
 
-        <div className="w-full max-w-sm mx-auto">
+        <div className="w-full">
           <select
             value={selectedCountry}
             onChange={(e) => setSelectedCountry(e.target.value)}
@@ -135,9 +160,9 @@ export default function Payment() {
 
         <button
           onClick={handlePayment}
-          className="w-full bg-[#369585] text-white py-2 rounded-full text-center"
+          className="w-full bg-[#369585] text-white py-2 rounded-full text-center font-semibold"
         >
-          Pay Now
+          Pay Now (EGP {totalPrice})
         </button>
       </div>
     </div>

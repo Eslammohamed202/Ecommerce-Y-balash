@@ -126,7 +126,7 @@ export default function DiaryProduct() {
             <div className='py-5 mx-6'>
                 <div className='flex gap-5 '>
                     <GiMilkCarton className='bg-[#E5E7EB] text-[#185C32] p-3 text-6xl rounded-full ' />
-                    <h2 className='font-poppins font-extrabold text-[30px] text-[#185C32] '>Milk & Dairy</h2>
+                    <h2 className='font-poppins font-extrabold text-[30px] text-[#185C32] '>Dairy</h2>
                 </div>
                 <p className=' py-3 font-poppins font-medium text-[18px] text-[#796E5F] '>
                     Browse our fresh, daily-delivered dairy products

@@ -183,6 +183,8 @@
 
 
 
+
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -218,21 +220,24 @@ export default function CartPage() {
     getCartData();
   }, []);
 
-const handleRemove = (cartItemId) => {
-  setCartItems((prevItems) =>
-    prevItems.filter((item) => item._id !== cartItemId)
-  );
-  toast.success("Item removed from cart");
+  const handleRemove = async (itemId) => {
+  try {
+    await axiosInstance.delete(`/cart/remove/${itemId}`);
+    toast.success("Item removed from cart");
+    getCartData();
+  } catch (error) {
+    console.error("Error removing item:", error.response?.data || error.message);
+    toast.error("Failed to remove item from cart");
+  }
 };
 
-
-  const handleQuantityChange = async (itemCartId, currentQty, action) => {
+  const handleQuantityChange = async (itemId, currentQty, action) => {
     const newQty = action === 'increase' ? currentQty + 1 : currentQty - 1;
     if (newQty < 1) return;
 
     try {
       await axiosInstance.put('/cart/update', {
-        itemId: itemCartId,
+        itemId,
         quantity: newQty,
       });
       toast.success('Quantity updated');
@@ -304,13 +309,14 @@ const handleRemove = (cartItemId) => {
                   <div>{(parseFloat(item.itemId.price.replace(/[^\d.]/g, "")) * item.quantity).toFixed(2)} EGP</div>
                   <div className="flex justify-end">
                     <button
-  onClick={() => handleRemove(item._id)}
-  className="text-red-500 hover:text-red-700"
->
-  <div className="w-6 h-6 rounded-full border border-red-500 flex items-center justify-center">
-    <X size={14} />
-  </div>
-</button>
+                      onClick={() => handleRemove(item.itemId._id)}
+
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <div className="w-6 h-6 rounded-full border border-red-500 flex items-center justify-center">
+                        <X size={14} />
+                      </div>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -363,3 +369,5 @@ const handleRemove = (cartItemId) => {
     </>
   );
 }
+
+
