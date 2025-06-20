@@ -436,10 +436,22 @@ const AddProductPage = () => {
             <label className="block text-sm font-medium text-gray-700">Price</label>
             <input name="price" type="number" value={product.price} onChange={handleInputChange} className="w-full border p-2 rounded" />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Category ID</label>
-            <input name="categoryId" value={product.categoryId} onChange={handleInputChange} className="w-full border p-2 rounded" />
-          </div>
+        <div>
+        <label className="block text-sm font-medium text-gray-700">Category</label>
+        <select
+          name="categoryId"
+          value={product.categoryId}
+          onChange={handleInputChange}
+          className="w-full border p-2 rounded"
+        >
+          <option value="">Select Category</option>
+          <option value="6790c4ef7b560c31cdb96905">Dairy</option>
+          <option value="6790c50f7b560c31cdb96907">Bakery</option>
+          <option value="6790c5287b560c31cdb96909">Dessert</option>
+          <option value="6790c799a732af882708e444">Beverages</option>
+        </select>
+      </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700">Restaurant ID</label>
             <input name="restaurantId" value={product.restaurantId} onChange={handleInputChange} className="w-full border p-2 rounded" />

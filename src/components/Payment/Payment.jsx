@@ -8,6 +8,9 @@ import { useRouter } from "next/navigation";
 const TOKEN =
   "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MDU0YjFlZmQ3OTIwODE3ZDllYmI5YyIsImlhdCI6MTc0ODg2MDE5NiwiZXhwIjoxNzUxNDUyMTk2fQ.0fkUoakCkGAv4Shtp7Pz2BYkZ87RHB7wb02xOENSLnA";
 
+// ✅ نثبت التوكن على جميع الطلبات
+axios.defaults.headers.common["Authorization"] = TOKEN;
+
 export default function Payment() {
   const [cardNumber, setCardNumber] = useState("");
   const [cvv, setCvv] = useState("");
@@ -28,10 +31,7 @@ export default function Payment() {
     const getCartData = async () => {
       try {
         const { data } = await axios.get(
-          "https://y-balash.vercel.app/api/cart",
-          {
-            headers: { Authorization: TOKEN },
-          }
+          "https://y-balash.vercel.app/api/cart"
         );
 
         const items = data.items || [];
@@ -40,7 +40,7 @@ export default function Payment() {
           return sum + price * el.quantity;
         }, 0);
 
-        const roundedTotal = Math.round(total * 100) / 100; // تقريب لرقمين عشريين
+        const roundedTotal = Math.round(total * 100) / 100;
         setTotalPrice(roundedTotal);
       } catch (error) {
         console.error("Error fetching cart:", error);
@@ -51,55 +51,74 @@ export default function Payment() {
   }, []);
 
   const handlePayment = async () => {
-  const correctCard = "4242424242424242";
-  const correctCvv = "123";
+    const correctCard = "4242424242424242";
+    const correctCvv = "123";
 
-  if (cardNumber === correctCard && cvv === correctCvv) {
-    try {
-      const amountInCents = Math.round(totalPrice);
-      
-      if (isNaN(amountInCents)) {
-        throw new Error("Invalid amount");
-      }
+    if (cardNumber === correctCard && cvv === correctCvv) {
+      try {
+        const amount = Number(totalPrice); // مش بنضرب في 100 عشان الـ backend بيرجع مبلغ زى ما هو
 
-      console.log("totalPrice:", totalPrice);
-      console.log("amountInCents:", amountInCents);
-      console.log("Sending payload:", { amount: amountInCents });
-
-      const { data } = await axios.post(
-        "https://y-balash.vercel.app/api/purchases/payment",
-        { amount: amountInCents },
-        {
-          headers: {
-            Authorization: TOKEN,
-            "Content-Type": "application/json",
-          },
+        if (isNaN(amount)) {
+          throw new Error("Invalid amount");
         }
-      );
 
-      if (data.clientSecret) {
-        Swal.fire("Success", "Payment completed successfully", "success");
-        setTimeout(() => {
-          router.push("/client-home");
-        }, 3000);
-      } else {
-        Swal.fire("Error", "Something went wrong with the payment", "error");
+        console.log("Sending payment with amount:", amount);
+
+        const { data } = await axios.post(
+          "https://y-balash.vercel.app/api/purchases/payment",
+          { amount },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("Payment response:", data);
+
+        if (data.clientSecret) {
+          Swal.fire("Success", "Payment completed successfully", "success");
+
+          try {
+            const cartRes = await axios.get(
+              "https://y-balash.vercel.app/api/cart"
+            );
+
+            const items = cartRes.data.items || [];
+
+            await Promise.all(
+              items.map((item) =>
+                axios.delete(
+                  `https://y-balash.vercel.app/api/cart/remove/${item.itemId._id}`
+                )
+              )
+            );
+
+            console.log("Cart cleared after payment.");
+          } catch (clearError) {
+            console.error("Error clearing cart:", clearError);
+          }
+
+          setTimeout(() => {
+            router.push("/client-home");
+          }, 3000);
+        } else {
+          Swal.fire("Error", "Something went wrong with the payment", "error");
+        }
+      } catch (error) {
+        console.error("Payment error:", error);
+        Swal.fire(
+          "Error",
+          error.response?.data?.message || "Payment API error",
+          "error"
+        );
       }
-    } catch (error) {
-      console.error("Payment error:", error);
-      Swal.fire(
-        "Error",
-        error.response?.data?.message || "Payment API error",
-        "error"
-      );
+    } else if (cvv !== correctCvv) {
+      Swal.fire("Error", "Invalid CVV", "error");
+    } else {
+      Swal.fire("Error", "Invalid Card Number", "error");
     }
-  } else if (cvv !== correctCvv) {
-    Swal.fire("Error", "Invalid CVV", "error");
-  } else {
-    Swal.fire("Error", "Invalid Card Number", "error");
-  }
-};
-
+  };
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-100">
@@ -165,6 +184,6 @@ export default function Payment() {
           Pay Now (EGP {totalPrice})
         </button>
       </div>
-    </div>
-  );
+    </div>
+  );
 }

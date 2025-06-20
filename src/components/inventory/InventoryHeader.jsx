@@ -18,10 +18,10 @@ const InventoryHeader = () => {
           </div>
         </div>
         <div>
-            <Link href="/add-product">
-             <button className="py-2 px-4 bg-Main text-white rounded-xl lg:text-lg md:text-md text-sm hover:bg-Main/90 transition duration-200">
-                Add New Product
-              </button>
+          <Link href="/add-product">
+            <button className="py-2 px-4 bg-Main text-white rounded-xl lg:text-lg md:text-md text-sm hover:bg-Main/90 transition duration-200">
+              Add New Product
+            </button>
           </Link>
          
         </div>
