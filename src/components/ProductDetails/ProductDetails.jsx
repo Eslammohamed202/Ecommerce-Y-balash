@@ -6,9 +6,10 @@ import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { FallingLines } from "react-loader-spinner";
-import { cartContext } from "../../Context/CartContext";
 import toast from "react-hot-toast";
-// import NavbarCategory from "../NavbarCategory/NavbarCategory";
+import SimilarDetailsProduct from "../SimilarDetailsProduct/SimilarDetailsProduct";
+import NavbarCategory from "../NavbarCategory/NavbarCategory";
+import { cartContext } from "../Context/AuthContext/CartContext";
 
 export default function ProductDetails() {
   const [allProductDetails, setAllProductDetails] = useState(null);
@@ -83,7 +84,7 @@ export default function ProductDetails() {
 
   return (
     <>
-      {/* <NavbarCategory /> */}
+      <NavbarCategory />
 
       <div
         key={allProductDetails._id}
@@ -139,7 +140,7 @@ export default function ProductDetails() {
         </div>
       </div>
 
-      
+      <SimilarDetailsProduct />
     </>
   );
 }
