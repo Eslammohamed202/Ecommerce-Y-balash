@@ -165,9 +165,12 @@ const token = typeof window !== "undefined" ? localStorage.getItem("token") : nu
 
       // حساب السعر الكلي
       const totalPriceCalc = items.reduce((acc, item) => {
-        const priceNum = parseFloat(item.itemId.price.replace(/[^\d.]/g, "")) || 0;
-        return acc + priceNum * item.quantity;
-      }, 0);
+  const priceStr = item?.itemId?.price ?? '';
+  const quantity = item?.quantity ?? 0;
+  const priceNum = parseFloat(priceStr.toString().replace(/[^\d.]/g, "")) || 0;
+  return acc + priceNum * quantity;
+}, 0);
+
       setTotalPrice(totalPriceCalc);
 
       return true;
