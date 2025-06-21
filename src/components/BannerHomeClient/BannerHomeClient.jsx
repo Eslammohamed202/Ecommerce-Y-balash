@@ -77,11 +77,13 @@ export default function BannerHome() {
       <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-8 ml-6 mr-6 my-4 mb-[50px] ml-[25px]">
         {categories.map((cat) => (
           <div key={cat._id} className="flex items-center justify-between bg-[#FFFFFF] rounded-3xl">
-            <Link href={`/${cat.name.replace(/\s+/g, '')}Product`}>
-              <div className="bg-[#FFFFFF] mb-[65px] cursor-pointer">
-                <h3 className="ml-[15px] text-[#0B332B] font-inter font-semibold text-[24px]">{cat.name}</h3>
-              </div>
-            </Link>
+            <Link href={`/${typeof cat.name === 'string' ? cat.name.replace(/\s+/g, '') : ''}Product`}>
+  <div className="bg-[#FFFFFF] mb-[65px] cursor-pointer">
+    <h3 className="ml-[15px] text-[#0B332B] font-inter font-semibold text-[24px]">
+      {cat.name || 'Unnamed Category'}
+    </h3>
+  </div>
+</Link>
             <Image
               className="mt-[15px] relative right-[28px] top-2"
               width={155}

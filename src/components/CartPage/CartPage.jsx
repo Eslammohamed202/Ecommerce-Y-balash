@@ -249,7 +249,7 @@ export default function CartPage() {
 
   const totalPrice = cartItems.reduce((acc, item) => {
     const priceStr = item.itemId.price || "0";
-    const priceNum = parseFloat(priceStr.replace(/[^\d.]/g, "")) || 0;
+    const priceNum = parseFloat((priceStr || '').toString().replace(/[^\d.]/g, '')) || 0;
     return acc + priceNum * item.quantity;
   }, 0);
 
@@ -306,7 +306,12 @@ export default function CartPage() {
                       +
                     </button>
                   </div>
-                  <div>{(parseFloat(item.itemId.price.replace(/[^\d.]/g, "")) * item.quantity).toFixed(2)} EGP</div>
+                  <div>
+  {(
+    parseFloat((item?.itemId?.price || '').toString().replace(/[^\d.]/g, "")) * (item?.quantity || 0)
+  ).toFixed(2)} EGP
+</div>
+
                   <div className="flex justify-end">
                     <button
                       onClick={() => handleRemove(item.itemId._id)}

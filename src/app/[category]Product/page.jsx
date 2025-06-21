@@ -8,22 +8,30 @@ export default function CategoryProductPage() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    const fetchCategoryProducts = async () => {
-      try {
-        const res = await fetch(`https://y-balash.vercel.app/api/products/category/${categoryName.replace('Product', '')}`);
-        const data = await res.json();
-        setProducts(data);
-      } catch (err) {
-        console.error('Failed to fetch products:', err);
-      }
-    };
+  if (typeof categoryName !== 'string') return;
 
-    fetchCategoryProducts();
-  }, [categoryName]);
+  const fetchCategoryProducts = async () => {
+    try {
+      const cleanCategory = categoryName.replace('Product', '');
+      const res = await fetch(`https://y-balash.vercel.app/api/products/category/${cleanCategory}`);
+      const data = await res.json();
+      setProducts(data);
+    } catch (err) {
+      console.error('❌ Failed to fetch products:', err);
+    }
+  };
+
+  fetchCategoryProducts();
+}, [categoryName]);
+
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">{categoryName.replace('Product', '')} Products</h1>
+      <h1 className="text-2xl font-bold mb-4">
+  {typeof categoryName === 'string'
+    ? `${categoryName.replace('Product', '')} Products`
+    : 'Products'}
+</h1>
       {products.length === 0 ? (
         <p>No products found.</p>
       ) : (

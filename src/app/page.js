@@ -16,45 +16,49 @@ export default function Home() {
   const [username, setUsername] = useState("Seller"); 
 
   useEffect(() => {
-    if (status === "loading") return;
-    if (!session) {
-      router.push("/login");
+  if (status === "loading") return;
+  if (!session) {
+    router.push("/login");
+    return;
+  }
+
+  const fetchUsername = async () => {
+    const token = session?.user?.token;
+
+    if (!token) {
+      console.error("No access token available");
       return;
     }
 
-    const fetchUsername = async () => {
-      console.log("Access Token:", session?.user?.token); // تحقق من التوكن
-      if (!session?.user?.token) {
-        console.error("No access token available");
-        return;
+    try {
+      const response = await fetch("https://y-balash.vercel.app/api/user/welcome", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.ok && typeof data.message === "string") {
+        const match = data.message.match(/Welcome back, (.+?)!/);
+        const extractedName = match?.[1] || "Seller";
+        setUsername(extractedName);
+      } else {
+        console.error("Failed to fetch username:", data.message);
       }
+    } catch (error) {
+      console.error("Error fetching username:", error);
+    }
+  };
 
-      try {
-        const response = await fetch("https://y-balash.vercel.app/api/user/welcome", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${session?.user?.token}`,
-          },
-        });
+  fetchUsername();
+}, [session, status, router]);
 
-        const data = await response.json();
-        if (response.ok) {
-          const extractedName = data.message?.split("Welcome back, ")[1]?.replace("!", "") || "Seller";
-          setUsername(extractedName);
-        } else {
-          console.error("Failed to fetch username:", data.message);
-        }
-      } catch (error) {
-        console.error("Error fetching username:", error);
-      }
-    };
+if (status === "loading" || !session) {
+  return null;
+}
 
-    fetchUsername();
-  }, [session, status, router]);
-
-  if (status === "loading" || !session) {
-    return null;
-  }
 
   return (
     <div>
