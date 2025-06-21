@@ -1,14 +1,11 @@
-// src/app/client-home/page.jsx
-"use client";
-import ProductDetails from "@/components/ProductDetails/ProductDetails";
+'use client';
 
-export default function ClientHome() {
+import ProductDetails from '@/components/ProductDetails/ProductDetails';
 
+export default function ProductDetailsPage() {
   return (
-    <div>
-      
+    <div className="min-h-screen bg-white">
       <ProductDetails />
-     
     </div>
   );
 }

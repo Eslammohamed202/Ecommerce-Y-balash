@@ -139,7 +139,7 @@ export default function NavbarHome() {
                   searchResults.map((item, index) => (
                     <Link
                       key={index}
-                      href={`/productdetails/${item._id}`}
+                      // href={`/productdetails/${item._id}`}
                       className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 text-black"
                       onClick={() => setSearchTerms("")}
                     >

@@ -93,8 +93,8 @@ export default function GetCategories() {
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 mx-6 my-4 gap-6">
                 {getAllCategories.map((product) => (
                     <div className="flex flex-col items-center p-6 gap-5 bg-white" key={product._id}>
-                        <Link href={`/ProductDetails/${product._id}`}>
-                        
+                        {/* <Link href={`/ProductDetails/${product._id}`}> */}
+                        <Link>
                             <img
                                 className="h-[226px] w-[226px] object-contain bg-[#E5E7EB]"
                                 src={product.imageUrl}

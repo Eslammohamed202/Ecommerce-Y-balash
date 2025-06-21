@@ -141,7 +141,8 @@ export default function Bakery() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 mx-6 my-4 gap-6">
                     {getAllCategories.map((product) => (
                         <div className="flex flex-col items-center p-6 gap-5 bg-[#FFFFFF]" key={product._id}>
-                            <Link href={`/productdetails/${product._id}`}>
+                            {/* <Link href={`/productdetails/${product._id}`}> */}
+                            <Link>
                                 <img className='h-[226px] w-[226px] object-contain bg-[#E5E7EB]' src={product.imageUrl} alt="name" />
                                 <div className='flex justify-between items-center gap-20 mt-[15px]'>
                                     <h3 className="text-[#1C573E] font-poppins font-semibold text-[16px]">{product.name}</h3>
