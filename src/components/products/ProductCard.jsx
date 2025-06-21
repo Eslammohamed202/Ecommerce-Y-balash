@@ -8,7 +8,8 @@ import { useRouter } from 'next/navigation';
 import { ProductContext } from '@/app/utils/ProductContext';
 
 const ProductCard = () => {
-  const { filteredProducts, deleteProduct, products } = useContext(ProductContext); 
+  const { filteredProducts, deleteProduct, products, setProducts, setFilteredProducts } =
+    useContext(ProductContext);
 
   const router = useRouter();
 
@@ -16,7 +17,6 @@ const ProductCard = () => {
   useEffect(() => {
     if (typeof window !== 'undefined' && products.length > 0) {
       localStorage.setItem('products', JSON.stringify(products));
-      setSaved(true);
     }
   }, [products]);
 
@@ -28,7 +28,8 @@ const ProductCard = () => {
         try {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed)) {
-            // يمكنك استخدام البيانات هنا أو إرسالها إلى السياق مثلاً
+            setProducts(parsed);
+            setFilteredProducts(parsed);
             console.log('✅ Loaded products from localStorage:', parsed);
           }
         } catch (error) {
@@ -36,6 +37,7 @@ const ProductCard = () => {
         }
       }
     }
+  }, []);
 
   const handleEdit = (id) => {
     if (id) {
@@ -46,11 +48,12 @@ const ProductCard = () => {
   };
 
   const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
+    if (typeof window !== 'undefined' && window.confirm('Are you sure you want to delete this product?')) {
       deleteProduct(id);
 
-      // تحديث localStorage بعد الحذف
       const updated = products.filter((p) => p.id !== id);
+      setProducts(updated);
+      setFilteredProducts(updated);
       localStorage.setItem('products', JSON.stringify(updated));
     }
   };
@@ -59,7 +62,9 @@ const ProductCard = () => {
     <div className="flex container lg:mt-12 mt-6 lg:mb-12 mb-6 flex-wrap items-center justify-center gap-4">
       {filteredProducts.length === 0 ? (
         <div className="w-full text-center py-8">
-          {filteredProducts === products ? 'Loading products...' : 'No products match your search'}
+          {filteredProducts === products
+            ? 'Loading products...'
+            : 'No products match your search'}
         </div>
       ) : (
         filteredProducts.map((product) => (
@@ -94,9 +99,7 @@ const ProductCard = () => {
               <h3 className="text-Main font-semibold text-lg">{product.name}</h3>
               <p className="text-gray-500 text-sm">{product.description}</p>
               <div className="flex justify-between items-center mt-2 px-2">
-                <span className="text-Main font-bold">
-                  {product.price}
-                </span>
+                <span className="text-Main font-bold">{product.price}</span>
                 <span className="text-gray-500 text-sm">{product.stock} units</span>
               </div>
             </div>
