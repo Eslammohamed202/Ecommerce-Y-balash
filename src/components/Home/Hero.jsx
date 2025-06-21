@@ -107,11 +107,16 @@ const Hero = () => {
 
   const [staticProductCount, setStaticProductCount] = useState(0);
 
-useEffect(() => {
-  const interval = setInterval(() => {
-    const count = localStorage.getItem('totalProducts');
-    setStaticProductCount(count ? parseInt(count) : 0);
-  }, 1000); // يحدث العدد كل ثانية
+  useEffect(() => {
+  if (typeof window !== 'undefined') {
+    const interval = setInterval(() => {
+      const count = localStorage.getItem('totalProducts');
+      setStaticProductCount(count ? parseInt(count, 10) : 0);
+    }, 1000);
+
+    // تنظيف الـ interval عند الخروج من المكون
+    return () => clearInterval(interval);
+  }
 
   return () => clearInterval(interval);
 }, []);

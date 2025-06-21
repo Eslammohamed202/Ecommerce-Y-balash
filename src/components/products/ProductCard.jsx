@@ -16,6 +16,7 @@ const ProductCard = () => {
   useEffect(() => {
     if (typeof window !== 'undefined' && products.length > 0) {
       localStorage.setItem('products', JSON.stringify(products));
+      setSaved(true);
     }
   }, [products]);
 
@@ -27,15 +28,14 @@ const ProductCard = () => {
         try {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed)) {
-            // فقط إذا لم تكن موجودة في السياق (optional)
-            console.log('Loaded products from localStorage:', parsed);
+            // يمكنك استخدام البيانات هنا أو إرسالها إلى السياق مثلاً
+            console.log('✅ Loaded products from localStorage:', parsed);
           }
         } catch (error) {
-          console.error('Failed to parse localStorage products:', error);
+          console.error('❌ Failed to parse localStorage products:', error);
         }
       }
     }
-  }, []);
 
   const handleEdit = (id) => {
     if (id) {

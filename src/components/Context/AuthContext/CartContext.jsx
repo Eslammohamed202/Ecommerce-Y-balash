@@ -115,7 +115,8 @@ export default function CartContextProvider({ children }) {
   const [quantity, setQuantity] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
 
-  const token = localStorage.getItem('token');
+const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
 
   async function addProduct(productId, numOfCart) {
     try {

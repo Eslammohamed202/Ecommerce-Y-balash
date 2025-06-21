@@ -12,20 +12,26 @@ export const ProductProvider = ({ children }) => {
 
   // جلب المنتجات من API
   const fetchProducts = async () => {
-    try {
-      const res = await axios.get('https://y-balash.vercel.app/api/seller/products-stats');
-      const fetched = res.data.products || [];
-      setProducts(fetched);
-      setFilteredProducts(fetched);
+  try {
+    const res = await axios.get('https://y-balash.vercel.app/api/seller/products-stats');
+    const fetched = res.data.products || [];
+    setProducts(fetched);
+    setFilteredProducts(fetched);
+
+    // ✅ استخدم localStorage فقط في المتصفح
+    if (typeof window !== 'undefined') {
       localStorage.setItem('products', JSON.stringify(fetched));
-      localStorage.setItem('totalProducts', fetched.length);
-    } catch (err) {
-      console.error('Error fetching products:', err);
+      localStorage.setItem('totalProducts', fetched.length.toString());
     }
-  };
+  } catch (err) {
+    console.error('Error fetching products:', err);
+  }
+};
+
 
   // تحميل البيانات من localStorage أولاً
   useEffect(() => {
+  if (typeof window !== 'undefined') {
     const saved = localStorage.getItem('products');
     if (saved) {
       try {
@@ -36,37 +42,46 @@ export const ProductProvider = ({ children }) => {
         } else {
           fetchProducts(); // fallback إذا البيانات فاسدة
         }
-      } catch {
+      } catch (error) {
+        console.error("Error parsing localStorage products:", error);
         fetchProducts(); // fallback في حالة خطأ في JSON
       }
     } else {
       fetchProducts(); // لو مفيش بيانات محفوظة
     }
-  }, []);
+  }
+}, []);
+
 
   // تحديث localStorage كل ما المنتجات تتغير
   useEffect(() => {
-    if (products.length > 0) {
-      localStorage.setItem('products', JSON.stringify(products));
-      localStorage.setItem('totalProducts', products.length);
-    }
-  }, [products]);
+  if (typeof window !== 'undefined' && products.length > 0) {
+    localStorage.setItem('products', JSON.stringify(products));
+    localStorage.setItem('totalProducts', products.length.toString());
+  }
+}, [products]);
 
   const addProduct = (newProduct) => {
-    const updated = [newProduct, ...products];
-    setProducts(updated);
-    setFilteredProducts([newProduct, ...filteredProducts]);
+  const updated = [newProduct, ...products];
+  setProducts(updated);
+  setFilteredProducts([newProduct, ...filteredProducts]);
+
+  if (typeof window !== 'undefined') {
     localStorage.setItem('products', JSON.stringify(updated));
-    localStorage.setItem('totalProducts', updated.length);
-  };
+    localStorage.setItem('totalProducts', updated.length.toString());
+  }
+};
 
   const deleteProduct = (id) => {
-    const updated = products.filter((p) => p.id !== id);
-    setProducts(updated);
-    setFilteredProducts(updated);
+  const updated = products.filter((p) => p.id !== id);
+  setProducts(updated);
+  setFilteredProducts(updated);
+
+  if (typeof window !== 'undefined') {
     localStorage.setItem('products', JSON.stringify(updated));
-    localStorage.setItem('totalProducts', updated.length);
-  };
+    localStorage.setItem('totalProducts', updated.length.toString());
+  }
+};
 
   const applyFilters = (productsToFilter, query = '') => {
     let result = [...productsToFilter];

@@ -357,9 +357,17 @@ const AddProductPage = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.message || 'Something went wrong');
-        return;
-      }
+  const errorMessage = data?.message || 'Something went wrong';
+  
+  if (typeof window !== 'undefined') {
+    alert(errorMessage);
+  } else {
+    console.error(errorMessage);
+  }
+
+  return;
+}
+
 
       let currentCount = localStorage.getItem('totalProducts');
       currentCount = currentCount ? parseInt(currentCount) + 1 : 1;

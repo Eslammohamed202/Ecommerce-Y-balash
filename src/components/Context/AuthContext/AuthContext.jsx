@@ -6,12 +6,13 @@ export default function AuthContextProvider({ children }) {
   const [token, setToken] = useState(null);
 
   useEffect(() => {
-    // شغاله فقط على المتصفح
+  if (typeof window !== 'undefined') {
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
       setToken(storedToken);
     }
-  }, []);
+  }
+}, []);
 
   return (
     <authContext.Provider value={{ token, setToken }}>
